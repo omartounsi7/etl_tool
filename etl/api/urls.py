@@ -3,5 +3,5 @@ from . import views
 
 urlpatterns = [
     path('', views.sayHello),
-    path('upload-csv/', views.CsvDataUploadView.as_view(), name='upload_csv')
+    path('upload-csv/', views.upload_csv, name='upload_csv'),
 ]

@@ -2,6 +2,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
+from rest_framework.test import APIClient
 
 from .models import CsvData
 
@@ -13,7 +14,8 @@ class CsvDataUploadViewTestCase(TestCase):
 
         # Send a POST request to the view with the CSV file
         url = reverse('upload_csv')
-        response = self.client.post(url, {'csv_file': csv_file}, format='multipart')
+        client = APIClient()
+        response = client.post(url, {'csv_file': csv_file}, format='multipart')
 
         # Assert the response status code and data
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -29,7 +31,8 @@ class CsvDataUploadViewTestCase(TestCase):
 
         # Send a POST request to the view with the invalid file
         url = reverse('upload_csv')
-        response = self.client.post(url, {'csv_file': invalid_file}, format='multipart')
+        client = APIClient()
+        response = client.post(url, {'csv_file': invalid_file}, format='multipart')
 
         # Assert the response status code and error message
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

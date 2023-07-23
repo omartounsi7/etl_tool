@@ -1,7 +1,8 @@
-from rest_framework.parsers import FormParser, MultiPartParser
+from django.core.files.uploadedfile import SimpleUploadedFile
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework import status
+
 from .models import CsvData
 from .serializers import CsvDataSerializer
 
@@ -11,10 +12,9 @@ from django.http import HttpResponse
 def sayHello(request):
     return HttpResponse("Hello World!")
 
-class CsvDataUploadView(APIView):
-    parser_classes = [FormParser, MultiPartParser]
-
-    def post(self, request, *args, **kwargs):
+@api_view(['POST'])
+def upload_csv(request):
+    if request.method == 'POST':
         csv_file = request.FILES.get('csv_file', None)
 
         # Check if a file was uploaded
