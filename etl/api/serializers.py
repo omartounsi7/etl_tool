@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from .models import CsvFile
+from .models import CsvData
 
-class CsvFileSerializer(serializers.ModelSerializer):
+class CsvDataSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CsvFile
-        fields = '__all__'
+        model = CsvData
+        fields = ('id', 'csv_data', 'uploaded_at')
