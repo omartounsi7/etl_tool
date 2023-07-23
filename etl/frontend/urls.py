@@ -3,5 +3,6 @@ from .views import index
 
 urlpatterns = [
     path('', index),
-    path('upload/', index)
+    path('upload/', index),
+    path('upload-success/', index)
 ]
