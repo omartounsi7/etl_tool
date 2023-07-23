@@ -52,7 +52,7 @@ def transform_csv_field(request):
             field_val = get_field_value(csv_data, row, col)
             
             field_val = field_val.replace('.', '', 1).replace('e', '', 1).replace('-', '', 1).replace('$', '', 1).replace('%', '', 1).replace('€', '', 1).replace('£', '', 1)
-            # Validate the field at the given coordinates (A4) contains a number
+            # Validate the field at the given coordinates contains a number
             if not field_val.isnumeric():
                 print("Not numeric")
                 return Response({"error": "The field at the given coordinates does not contain a number."}, status=status.HTTP_400_BAD_REQUEST)
@@ -62,6 +62,7 @@ def transform_csv_field(request):
             columns = rows[row - 1].split(',')
             current_value = float(columns[col - 1].replace('$', '', 1).replace('%', '', 1).replace('€', '', 1).replace('£', '', 1))
 
+            # Validate the op
             if op == "add":
                 new_value =  current_value + float(number)
             elif op == "sub":

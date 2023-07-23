@@ -63,10 +63,6 @@ class TransformCsvFieldViewTestCase(TestCase):
         # Check the error message in the response
         self.assertIn('Invalid coordinates.', response.data['error'])
 
-    # Add more test cases to cover other scenarios as needed
-
-
-
 class GetCsvViewTestCase(TestCase):
     def setUp(self):
         # Create some CsvData objects for testing

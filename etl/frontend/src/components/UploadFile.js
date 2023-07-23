@@ -22,7 +22,6 @@ const UploadFile = () => {
     const formData = new FormData();
     formData.append('csv_file', selectedFile);
 
-    // Adjust the URL to match your Django backend endpoint for file upload
     const uploadURL = 'http://127.0.0.1:9000/api/upload-csv/';
 
     axios.post(uploadURL, formData)
@@ -30,15 +29,15 @@ const UploadFile = () => {
         // Handle successful response
         console.log('File uploaded successfully:', response);
         setSuccessMessage('File uploaded successfully!');
-        setErrorMessage(null); // Clear any previous error message
-        // Redirect to another page (e.g., the home page)
+        setErrorMessage(null); // Clear previous error message
+        // Redirect to another page
         navigate('/upload-success');
       })
       .catch((error) => {
         // Handle error
         console.error('Error uploading file:', error);
         setErrorMessage('Error uploading file. Please try again.');
-        setSuccessMessage(null); // Clear any previous success message
+        setSuccessMessage(null); // Clear previous success message
       });
   };
 
