@@ -12,6 +12,14 @@ from django.http import HttpResponse
 def sayHello(request):
     return HttpResponse("Hello World!")
 
+
+@api_view(['GET'])
+def get_csv(request):
+    csv_data = CsvData.objects.last()
+    data = {'csv_data': csv_data.csv_data} if csv_data else {}
+    return Response(data)
+
+
 @api_view(['POST'])
 def upload_csv(request):
     if request.method == 'POST':
