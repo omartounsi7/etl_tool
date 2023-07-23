@@ -6,11 +6,11 @@ from rest_framework import status
 from .models import CsvData
 from .serializers import CsvDataSerializer
 
-from django.http import HttpResponse
+from django.http import HttpResponse 
 
 # Create your views here.
 def sayHello(request):
-    return HttpResponse("Hello World!")
+    return HttpResponse("Hello World!") 
 
 def is_number(s):
     try:
@@ -18,7 +18,6 @@ def is_number(s):
         return True
     except ValueError:
         return False
-
 
 def get_field_value(csv_data, row, col):
     rows = csv_data.strip().split('\r\n')
@@ -28,7 +27,7 @@ def get_field_value(csv_data, row, col):
     columns = rows[row - 1].split(',')
     if col >= len(columns):
         raise ValueError("Invalid coordinates.")
-
+    
     return columns[col - 1]
 
 @api_view(['POST'])
@@ -42,28 +41,33 @@ def transform_csv_field(request):
 
         # Check if all the required parameters are present
         if row_str is None or col_str is None or number_str is None or op is None:
+            print("Missing params.")
             return Response({"error": "Missing parameters. Please provide row, col, op and number."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            row = int(row_str)
+            row = int(row_str) 
             col = int(col_str)
-            number = float(number_str)
-            
+            number = float(number_str) 
+
             # Fetch the latest CSV data
             csv_data_obj = CsvData.objects.last()
             if not csv_data_obj:
+                print("No CSV data found.")
                 return Response({"error": "No CSV data found."}, status=status.HTTP_404_NOT_FOUND)
 
             csv_data = csv_data_obj.csv_data
-
+            field_val = get_field_value(csv_data, row, col)
+            
+            field_val = field_val.replace('.', '', 1).replace('e', '', 1).replace('-', '', 1).replace('$', '', 1).replace('%', '', 1).replace('€', '', 1).replace('£', '', 1)
             # Validate the field at the given coordinates (A4) contains a number
-            if not is_number(get_field_value(csv_data, row, col)):
+            if not field_val.isnumeric():
+                print("Not numeric")
                 return Response({"error": "The field at the given coordinates does not contain a number."}, status=status.HTTP_400_BAD_REQUEST)
 
             # Perform the addition operation
             rows = csv_data.strip().split('\r\n')
             columns = rows[row - 1].split(',')
-            current_value = float(columns[col - 1])
+            current_value = float(columns[col - 1].replace('$', '', 1).replace('%', '', 1).replace('€', '', 1).replace('£', '', 1))
 
             if op == "add":
                 new_value =  current_value + float(number)
@@ -74,6 +78,7 @@ def transform_csv_field(request):
             elif op == "div":
                 new_value =  current_value / float(number)
             else:
+                print("Invalid op")
                 return Response({"error": "Invalid operation."}, status=status.HTTP_400_BAD_REQUEST)
 
             columns[col - 1] = str(new_value)
@@ -89,12 +94,11 @@ def transform_csv_field(request):
             return Response(data, status=status.HTTP_200_OK)
 
         except ValueError as e:
+            print("Value error!") 
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
 
 @api_view(['GET'])
 def get_csv(request):

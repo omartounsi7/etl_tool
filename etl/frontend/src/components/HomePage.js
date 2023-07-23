@@ -6,7 +6,7 @@ import CsvTable from "./CsvTable";
 export default function HomePage() {
   return (
     <div>
-      <h1>Welcome to my custom ETL tool.</h1>
+      <h1>Welcome to my custom ETL tool!</h1>
       <Routes>
         <Route path="/upload-success" element={<CsvTable />} /> 
         <Route path="/upload" element={<UploadFile />} />
