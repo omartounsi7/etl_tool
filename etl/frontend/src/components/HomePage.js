@@ -1,14 +1,14 @@
 import React from "react";
 import UploadFile from "./UploadFile";
 import { Routes, Route, Link } from "react-router-dom";
-import SuccessfulUpload from "./SuccessfulUpload";
+import CsvTable from "./CsvTable";
 
 export default function HomePage() {
   return (
     <div>
       <h1>Welcome to my custom ETL tool.</h1>
       <Routes>
-        <Route path="/upload-success" element={<SuccessfulUpload />} /> 
+        <Route path="/upload-success" element={<CsvTable />} /> 
         <Route path="/upload" element={<UploadFile />} />
         <Route path="/" element={
         <><p>You are currently on the home page.</p>
