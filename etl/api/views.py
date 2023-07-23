@@ -12,13 +12,6 @@ from django.http import HttpResponse
 def sayHello(request):
     return HttpResponse("Hello World!") 
 
-def is_number(s):
-    try:
-        float(s)
-        return True
-    except ValueError:
-        return False
-
 def get_field_value(csv_data, row, col):
     rows = csv_data.strip().split('\r\n')
     if row < 1 or row >= len(rows) or col < 1:
