@@ -9,3 +9,5 @@ To use the tool, follow these steps:
 5) Run python manage.py makemigration
 6) Run python manage.py migrate
 7) Run python manage.py runserver [PORT]
+
+To run tests, run python manage.py test.
