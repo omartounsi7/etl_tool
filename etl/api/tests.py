@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
@@ -7,7 +8,45 @@ from rest_framework.test import APITestCase
 from rest_framework import status
 from .models import CsvData
 from .views import get_csv
+import os
 
+class DeleteCsvViewTest(APITestCase):
+    def setUp(self):
+        # Create a CsvData object for testing
+        self.csv_data = CsvData.objects.create(csv_data="Test CSV Data", file_name="test.csv")
+
+    def test_delete_csv_success(self):
+        file_name = 'test.csv'
+        url = reverse('delete_csv') + f'?file_name={file_name}'
+
+        # Send a DELETE request to delete the CSV file
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {"message": f"CSV file '{file_name}' deleted successfully."})
+
+        # Verify that the CsvData object has been deleted from the database
+        self.assertFalse(CsvData.objects.filter(file_name="test.csv").exists())
+
+        # Verify that the file has been deleted from the media folder
+        file_path = os.path.join(settings.MEDIA_ROOT, "test.csv")
+        self.assertFalse(os.path.exists(file_path))
+
+    def test_delete_csv_missing_filename(self):
+        url = reverse('delete_csv')
+
+        # Send a DELETE request without the 'file_name' parameter
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data, {"error": "File name was not provided."})
+
+    def test_delete_csv_not_found(self):
+        file_name = 'non_existent.csv'
+        url = reverse('delete_csv') + f'?file_name={file_name}'
+
+        # Send a DELETE request with a filename that does not exist
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data, {"error": "File does not exist."})
 
 class DownloadCsvTestCase(TestCase):
     def setUp(self):
@@ -43,7 +82,7 @@ class DownloadCsvTestCase(TestCase):
         response = client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(response.data, {"error": "CSV data does not exist."})
+        self.assertEqual(response.data, {"error": "File does not exist."})
 
 
 class TransformCSVFieldTest(APITestCase):

@@ -9,7 +9,7 @@ from .serializers import CsvDataSerializer
 
 from django.http import HttpResponse
 from django.core.files.storage import FileSystemStorage
-
+ 
 # Create your views here.
 def sayHello(request):
     return HttpResponse("Hello World!") 
@@ -140,6 +140,21 @@ def get_csv(request):
     data = {'csv_data': csv_data.csv_data} if csv_data else {}
     return Response(data)
 
+@api_view(['DELETE'])
+def delete_csv(request):
+    file_name = request.GET.get('file_name', None)
+
+    if not file_name:
+        return Response({"error": "File name was not provided."}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        csv_data_obj = CsvData.objects.get(file_name=file_name)
+    except CsvData.DoesNotExist:
+        return Response({"error": "File does not exist."}, status=status.HTTP_404_NOT_FOUND)
+
+    csv_data_obj.delete_file()
+    return Response({"message": f"CSV file '{file_name}' deleted successfully."}, status=status.HTTP_200_OK)
+
 @api_view(['GET'])
 def download_csv(request):
     file_name = request.GET.get('file_name', None)
@@ -147,15 +162,10 @@ def download_csv(request):
     if not file_name:
         return Response({"error": "File name was not provided."}, status=status.HTTP_400_BAD_REQUEST)
 
-    csv_data_objs = CsvData.objects.filter(file_name=file_name)
-
-    if not csv_data_objs.exists():
-        return Response({"error": "CSV data does not exist."}, status=status.HTTP_404_NOT_FOUND)
-
     try:
         csv_data = CsvData.objects.get(file_name=file_name)
     except CsvData.DoesNotExist:
-        return Response({"error": "CSV data does not exist."}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"error": "File does not exist."}, status=status.HTTP_404_NOT_FOUND)
     
     response = Response(csv_data.csv_data, content_type='text/csv', status=status.HTTP_200_OK)
     response['Content-Disposition'] = f'attachment; filename="{file_name}"'
