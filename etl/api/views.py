@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -6,7 +7,8 @@ from rest_framework import status
 from .models import CsvData
 from .serializers import CsvDataSerializer
 
-from django.http import HttpResponse 
+from django.http import HttpResponse
+from django.core.files.storage import FileSystemStorage
 
 # Create your views here.
 def sayHello(request):
@@ -138,6 +140,28 @@ def get_csv(request):
     data = {'csv_data': csv_data.csv_data} if csv_data else {}
     return Response(data)
 
+@api_view(['GET'])
+def download_csv(request):
+    file_name = request.GET.get('file_name', None)
+
+    if not file_name:
+        return Response({"error": "File name was not provided."}, status=status.HTTP_400_BAD_REQUEST)
+
+    csv_data_objs = CsvData.objects.filter(file_name=file_name)
+
+    if not csv_data_objs.exists():
+        return Response({"error": "CSV data does not exist."}, status=status.HTTP_404_NOT_FOUND)
+
+    try:
+        csv_data = CsvData.objects.get(file_name=file_name)
+    except CsvData.DoesNotExist:
+        return Response({"error": "CSV data does not exist."}, status=status.HTTP_404_NOT_FOUND)
+    
+    response = Response(csv_data.csv_data, content_type='text/csv', status=status.HTTP_200_OK)
+    response['Content-Disposition'] = f'attachment; filename="{file_name}"'
+    response['X-Accel-Redirect'] = f'/media/{file_name}'
+
+    return response
 
 @api_view(['POST'])
 def upload_csv(request):
@@ -151,14 +175,23 @@ def upload_csv(request):
         # Check if the uploaded file is a CSV file
         if not csv_file.name.lower().endswith('.csv'):
             return Response({"error": "Invalid file format. Please upload a CSV file."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if a file with the same name already exists
+        if CsvData.objects.filter(file_name=csv_file.name).exists():
+            return Response({"error": "A file with the same name already exists. Please choose a different name."}, status=status.HTTP_409_CONFLICT)
 
         try:
             # Read the contents of the CSV file
             csv_data = csv_file.read().decode('utf-8')
             
-            # Save the CSV data to the database
-            csv_data_obj = CsvData(csv_data=csv_data)
+            # Save the CSV data to the database along with the file name
+            csv_data_obj = CsvData(csv_data=csv_data, file_name=csv_file.name)
             csv_data_obj.save()
+
+
+            # Use FileSystemStorage to save the CSV file in the media folder
+            fs = FileSystemStorage(location=settings.MEDIA_ROOT)
+            fs.save(csv_file.name, csv_file)
 
             # Serialize the saved object and return the response
             serializer = CsvDataSerializer(csv_data_obj)
@@ -166,3 +199,4 @@ def upload_csv(request):
 
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        

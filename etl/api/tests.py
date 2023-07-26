@@ -1,24 +1,50 @@
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
-from rest_framework import status
 from rest_framework.test import APIClient
-
-from .models import CsvData
-
-from django.test import TestCase
 from rest_framework.test import APIRequestFactory
-from rest_framework import status
-from .views import get_csv
-from .models import CsvData
-from django.test import TestCase
-from rest_framework.test import APIRequestFactory
-from rest_framework import status
-from .views import transform_csv_field
-from .models import CsvData
-
-from django.urls import reverse
 from rest_framework.test import APITestCase
+from rest_framework import status
+from .models import CsvData
+from .views import get_csv
+
+
+class DownloadCsvTestCase(TestCase):
+    def setUp(self):
+        # Create test data
+        self.csv_data = "test_csv_data"
+        self.file_name = "test_file.csv"
+        self.csv_data_obj = CsvData.objects.create(csv_data=self.csv_data, file_name=self.file_name)
+
+    def test_download_csv_success(self):
+        client = APIClient()
+        url = f'/api/download-csv/?file_name={self.file_name}'
+
+        response = client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response['Content-Disposition'], f'attachment; filename="{self.file_name}"')
+        self.assertEqual(response.content.decode(), '"' + self.csv_data + '"')
+
+    def test_download_csv_no_file_name(self):
+        client = APIClient()
+        url = '/api/download-csv/'
+
+        response = client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data, {"error": "File name was not provided."})
+
+    def test_download_csv_file_not_found(self):
+        client = APIClient()
+        invalid_file_name = "invalid_file.csv"
+        url = f'/api/download-csv/?file_name={invalid_file_name}'
+
+        response = client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data, {"error": "CSV data does not exist."})
+
 
 class TransformCSVFieldTest(APITestCase):
     def setUp(self):
