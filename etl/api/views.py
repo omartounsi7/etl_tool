@@ -86,11 +86,9 @@ def transform_csv_field(request):
 
             # Check if user inputted end coordinates
             if (not end_row_str or not end_col_str):
-                print("End coordinates not found") 
                 # Update one field only 
                 csv_data = update_field_value(csv_data, start_row, start_col, op, number)
             else:
-                print("End coordinates were found") 
                 end_row = int(end_row_str) 
                 end_col = int(end_col_str)
 
@@ -154,6 +152,17 @@ def delete_csv(request):
 
     csv_data_obj.delete_file()
     return Response({"message": f"CSV file '{file_name}' deleted successfully."}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def list_files(request):
+    # Retrieve all CsvData objects from the database
+    csv_data_objects = CsvData.objects.all()
+
+    # Serialize the objects
+    serializer = CsvDataSerializer(csv_data_objects, many=True)
+
+    # Return the serialized data as the response
+    return Response(serializer.data)
 
 @api_view(['GET'])
 def download_csv(request):

@@ -84,6 +84,36 @@ class DownloadCsvTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data, {"error": "File does not exist."})
 
+class ListFilesViewTest(APITestCase):
+    def setUp(self):
+        # Create test CsvData objects for testing
+        self.csv_data1 = CsvData.objects.create(csv_data="Test CSV Data 1", file_name="test1.csv")
+        self.csv_data2 = CsvData.objects.create(csv_data="Test CSV Data 2", file_name="test2.csv")
+
+    def test_list_files_success(self):
+        url = reverse('list_files')
+
+        # Send a GET request to list all files
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Verify that all CsvData objects are returned in the response
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]['file_name'], 'test1.csv')
+        self.assertEqual(response.data[1]['file_name'], 'test2.csv')
+
+    def test_list_files_empty(self):
+        # Delete all CsvData objects to simulate an empty database
+        CsvData.objects.all().delete()
+
+        url = reverse('list_files')
+
+        # Send a GET request when no files are available
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Verify that an empty list is returned in the response
+        self.assertEqual(len(response.data), 0)
 
 class TransformCSVFieldTest(APITestCase):
     def setUp(self):
