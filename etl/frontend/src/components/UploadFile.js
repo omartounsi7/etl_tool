@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link, useNavigate  } from "react-router-dom";
+import './upload.css';
 
 const UploadFile = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -41,11 +42,36 @@ const UploadFile = () => {
       });
   };
 
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setSelectedFile(e.dataTransfer.files[0]);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+  };
+
   return (
     <div>
       {successMessage && <p>{successMessage}</p>}
       {errorMessage && <p>{errorMessage}</p>}
       <p>Please upload a file.</p>
+      <div
+        className="drop-container"
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+      >
+        {selectedFile ? (
+          <p>{selectedFile.name}</p>
+        ) : (
+          <p>Drag and drop a file here or click to select a file</p>
+        )}
+      </div>
       <input type="file" onChange={handleFileChange} />
       <button onClick={handleFileUpload}>Upload</button>
       <br></br><br></br>
@@ -60,3 +86,5 @@ function getCookie(name) {
 }
 
 export default UploadFile;
+
+
