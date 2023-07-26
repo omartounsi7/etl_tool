@@ -6,8 +6,12 @@ import { Link } from 'react-router-dom';
 const CsvTable = () => {
   const [csvData, setCsvData] = useState([]);
   const [headers, setHeaders] = useState([]);
-  const [rowData, setRowData] = useState('');
-  const [colData, setColData] = useState('');
+  const [startRowData, setStartRowData] = useState('');
+  const [startColData, setStartColData] = useState('');
+
+  const [endRowData, setEndRowData] = useState('');
+  const [endColData, setEndColData] = useState('');
+
   const [numberData, setNumberData] = useState('');
   const [opData, setOpData] = useState('add');
   const [errorMessage, setErrorMessage] = useState('');
@@ -59,11 +63,14 @@ const CsvTable = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
       const response = await axios.post('/api/transform-csv/', {
-        row: rowData,
-        col: colData,
-        number: numberData,
+        startRow: startRowData,
+        startCol: startColData,
+        endRow: endRowData,
+        endCol: endColData,
+        number: numberData, 
         op: opData,
       });
 
@@ -72,7 +79,7 @@ const CsvTable = () => {
       setErrorMessage('');
     } catch (error) {
       console.error('Error transforming CSV field:', error);
-      setErrorMessage('An error occurred while transforming the data. You may have tried to transform an field text or out of bounds field.'); // Update the error message state
+      setErrorMessage('An error occurred while transforming the data. You may have entered invalid coordinates or tried to transform a text field or an out of bounds field.'); // Update the error message state
     }
   };
 
@@ -90,15 +97,27 @@ const CsvTable = () => {
 
       <form onSubmit={handleSubmit}>
         <label>
-          Row:
-          <input type="text" value={rowData} onChange={(e) => setRowData(e.target.value)} />
+          Start row:
+          <input type="text" value={startRowData} onChange={(e) => setStartRowData(e.target.value)} />
         </label>
         <br />
         <label>
-          Column:
-          <input type="text" value={colData} onChange={(e) => setColData(e.target.value)} />
+          Start column:
+          <input type="text" value={startColData} onChange={(e) => setStartColData(e.target.value)} />
         </label>
         <br />
+
+        <label>
+          End row:
+          <input type="text" value={endRowData} onChange={(e) => setEndRowData(e.target.value)} />
+        </label>
+        <br />
+        <label>
+          End column:
+          <input type="text" value={endColData} onChange={(e) => setEndColData(e.target.value)} />
+        </label>
+        <br />
+
         <label>
           Number:
           <input type="number" value={numberData} onChange={(e) => setNumberData(e.target.value)} />
@@ -116,6 +135,7 @@ const CsvTable = () => {
         <br />
         <button type="submit">Apply Transformation</button>
       </form>
+      <p>If you wish to modify one field only, enter the start coordinates and leave the end coordinates blank.</p>
       <p>Rows and columns are one-indexed.</p>
 
       <br />

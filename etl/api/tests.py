@@ -17,51 +17,86 @@ from rest_framework import status
 from .views import transform_csv_field
 from .models import CsvData
 
-class TransformCsvFieldViewTestCase(TestCase):
+from django.urls import reverse
+from rest_framework.test import APITestCase
+
+class TransformCSVFieldTest(APITestCase):
     def setUp(self):
-        # Create a CsvData object for testing
-        CsvData.objects.create(csv_data="Transaction ID,Transaction Date,Amount,Merchant Name\r\n123456,2022-04-01,50.00,Acme Retail\r\n")
+        # Create some CsvData objects for testing
+        CsvData.objects.create(csv_data="1,2,3\r\n4,5,6\r\n7,8,9\r\nA,B,C\r\nD,E,F\r\n")
 
-    def test_transform_csv_field_with_valid_data(self):
-        # Prepare the data for the POST request
+    def test_transform_single_field(self):
+        # Define the data for the POST request
         data = {
-            'row': '2',
-            'col': '3',
-            'number': '25.00',
+            'startRow': '1',
+            'startCol': '1',
+            'number': '10',
             'op': 'add',
         }
 
-        # Make a POST request to the view
-        factory = APIRequestFactory()
-        request = factory.post('/api/transform-csv/', data)
-        response = transform_csv_field(request)
+        # Make the POST request to the view
+        url = reverse('transform_csv')  # Adjust the URL name to match your actual URL configuration
+        response = self.client.post(url, data)
 
-        # Check the response status code
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Assert that the response has a 200 status code
+        self.assertEqual(response.status_code, 200)
 
-        # Check that the CSV data was updated correctly
-        expected_csv_data = "Transaction ID,Transaction Date,Amount,Merchant Name\r\n123456,2022-04-01,75.00,Acme Retail\r\n"
-        self.assertEqual(response.data['csv_data'], expected_csv_data)
+        # Get the updated CSV data from the response
+        updated_csv_data = response.data.get('csv_data')
 
-    def test_transform_csv_field_with_invalid_coordinates(self):
-        # Prepare invalid coordinates in the data for the POST request
+        # Assert that the updated CSV data contains the expected values
+        expected_csv_data = "11.0,2,3\r\n4,5,6\r\n7,8,9\r\nA,B,C\r\nD,E,F"
+        self.assertEqual(updated_csv_data, expected_csv_data)
+
+    def test_transform_multiple_fields(self):
+        # Define the data for the POST request
         data = {
-            'row': '5',
-            'col': '3',
-            'number': '25.00',
+            'startRow': '1',
+            'startCol': '1',
+            'endRow': '3',
+            'endCol': '3',
+            'number': '10',
             'op': 'add',
         }
 
-        # Make a POST request to the view
-        factory = APIRequestFactory()
-        request = factory.post('/api/transform-csv/', data)
-        response = transform_csv_field(request)
+        # Make the POST request to the view
+        url = reverse('transform_csv')  # Adjust the URL name to match your actual URL configuration
+        response = self.client.post(url, data)
 
-        # Check the response status code
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        # Assert that the response has a 200 status code
+        self.assertEqual(response.status_code, 200)
 
-        # Check the error message in the response
-        self.assertIn('Invalid coordinates.', response.data['error'])
+        # Get the updated CSV data from the response
+        updated_csv_data = response.data.get('csv_data')
+
+        # Assert that the updated CSV data contains the expected values
+        expected_csv_data = "11.0,12.0,13.0\r\n14.0,15.0,16.0\r\n17.0,18.0,19.0\r\nA,B,C\r\nD,E,F"
+        self.assertEqual(updated_csv_data, expected_csv_data)
+
+    def test_invalid_inputs(self):
+        # Define the data for the POST request
+        data = {
+            'startRow': '1',
+            'startCol': '1',
+            'endRow': '4',
+            'endCol': '4',
+            'number': '10',
+            'op': 'add',
+        }
+
+        # Make the POST request to the view
+        url = reverse('transform_csv')  # Adjust the URL name to match your actual URL configuration
+        response = self.client.post(url, data)
+
+        # Assert that the response has a 200 status code
+        self.assertEqual(response.status_code, 400)
+
+        # Get the updated CSV data from the response
+        updated_csv_data = response.data.get('csv_data')
+
+        # Assert that the updated CSV data contains the expected values
+        expected_csv_data = None
+        self.assertEqual(updated_csv_data, expected_csv_data)
 
 class GetCsvViewTestCase(TestCase):
     def setUp(self):
