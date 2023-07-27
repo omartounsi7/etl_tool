@@ -20,7 +20,7 @@ const UploadFile = () => {
     setSelectedFile(e.target.files[0]);
   };
 
-  const handleFileUpload = () => {
+  const handleFileUpload = (fileName) => {
     const formData = new FormData();
     formData.append('csv_file', selectedFile);
 
@@ -33,7 +33,7 @@ const UploadFile = () => {
         setSuccessMessage('File uploaded successfully!');
         setErrorMessage(null); // Clear previous error message
         // Redirect to another page
-        navigate('/display-file');
+        navigate(`/display-file/${fileName}`);
       })
       .catch((error) => {
         // Handle error
@@ -74,7 +74,7 @@ const UploadFile = () => {
         )}
       </div>
       <input type="file" onChange={handleFileChange} />
-      <button onClick={handleFileUpload}>Upload</button>
+      <button onClick={() => handleFileUpload(selectedFile.name)}>Upload</button>
       <br></br><br></br>
       <Link to="/">Go back to the home page</Link>
     </div>
