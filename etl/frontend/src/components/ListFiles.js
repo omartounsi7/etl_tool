@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const ListFiles = () => {
   const [files, setFiles] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Fetch data from Django API endpoint
@@ -50,6 +51,11 @@ const ListFiles = () => {
     }
   };
 
+  const handleDisplay = () => {
+    // Navigate to the CsvTable component with the file_name as a URL parameter
+    navigate(`/display-file`);
+  };
+
   return (
     <div>
       <h2>Uploaded Files:</h2>
@@ -62,6 +68,7 @@ const ListFiles = () => {
               <th>Uploaded At</th>
               <th>Download</th>
               <th>Delete</th>
+              <th>Display</th>
             </tr>
           </thead>
           <tbody>
@@ -76,6 +83,9 @@ const ListFiles = () => {
                 <td>
                   <button onClick={() => handleDelete(file.file_name)}>Delete</button>
                 </td>
+                <td>
+                  <button onClick={() => handleDisplay()}>Display</button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -83,7 +93,6 @@ const ListFiles = () => {
       ) : (
         <p>No files available.</p>
       )}
-      <br />
       <Link to="/">Go back to the home page</Link>
     </div>
   );

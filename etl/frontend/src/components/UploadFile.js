@@ -32,7 +32,7 @@ const UploadFile = () => {
         setSuccessMessage('File uploaded successfully!');
         setErrorMessage(null); // Clear previous error message
         // Redirect to another page
-        navigate('/upload-success');
+        navigate('/display-file');
       })
       .catch((error) => {
         // Handle error

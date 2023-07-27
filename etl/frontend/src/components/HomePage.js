@@ -10,7 +10,7 @@ export default function HomePage() {
       <h1>Welcome to my custom ETL tool!</h1>
       <Routes>
         <Route path="/list-files" element={<ListFiles />} /> 
-        <Route path="/upload-success" element={<CsvTable />} /> 
+        <Route path="/display-file" element={<CsvTable />} /> 
         <Route path="/upload" element={<UploadFile />} />
         <Route path="/" element={
         <>
@@ -18,10 +18,10 @@ export default function HomePage() {
         <nav>
           <ul>
             <li>
-              <Link to="/upload">Upload a file</Link>
+              <Link to="/upload">Upload a new file</Link> 
             </li>
             <li>
-              <Link to="/list-files">Retrieve a file</Link>
+              <Link to="/list-files">Retrieve an existing file</Link>
             </li>
           </ul>
         </nav>

@@ -4,6 +4,6 @@ from .views import index
 urlpatterns = [
     path('', index),
     path('upload/', index),
-    path('upload-success/', index),
+    path('display-file/', index),
     path('list-files/', index) 
 ]
