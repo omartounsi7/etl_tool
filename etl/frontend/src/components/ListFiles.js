@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const ListFiles = () => {
   const [files, setFiles] = useState([]);
@@ -7,7 +8,12 @@ const ListFiles = () => {
   useEffect(() => {
     // Fetch data from Django API endpoint
     const fetchData = async () => {
-      try {
+
+        // Fetch the CSRF token and set it in Axios headers
+        const csrftoken = getCookie('csrftoken');
+        axios.defaults.headers.common['X-CSRFToken'] = csrftoken;
+
+        try {
         const response = await axios.get('/api/list-files/');
         setFiles(response.data);
       } catch (error) {
@@ -31,6 +37,19 @@ const ListFiles = () => {
     document.body.removeChild(link);
   };
 
+  const handleDelete = async (fileName) => {
+    try {
+      // Call the API to delete the file
+      const response = await axios.delete(`/api/delete-csv/?file_name=${fileName}`);
+      console.log(response.data); // Log the response from the server
+
+      // Update the files state to reflect the deletion
+      setFiles((prevFiles) => prevFiles.filter((file) => file.file_name !== fileName));
+    } catch (error) {
+      console.error('Error deleting file:', error);
+    }
+  };
+
   return (
     <div>
       <h2>Uploaded Files:</h2>
@@ -42,6 +61,7 @@ const ListFiles = () => {
               <th>File Name</th>
               <th>Uploaded At</th>
               <th>Download</th>
+              <th>Delete</th>
             </tr>
           </thead>
           <tbody>
@@ -53,6 +73,9 @@ const ListFiles = () => {
                 <td>
                   <button onClick={() => handleDownload(file.file_name)}>Download</button>
                 </td>
+                <td>
+                  <button onClick={() => handleDelete(file.file_name)}>Delete</button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -60,8 +83,15 @@ const ListFiles = () => {
       ) : (
         <p>No files available.</p>
       )}
+      <br />
+      <Link to="/">Go back to the home page</Link>
     </div>
   );
 };
 
-export default ListFiles;
+function getCookie(name) {
+    const cookieValue = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+    return cookieValue ? cookieValue.pop() : '';
+}
+
+export default ListFiles; 
