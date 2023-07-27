@@ -134,9 +134,19 @@ def transform_csv_field(request):
 
 @api_view(['GET']) 
 def get_csv(request):
-    csv_data = CsvData.objects.last()
-    data = {'csv_data': csv_data.csv_data} if csv_data else {}
-    return Response(data)
+    file_name = request.GET.get('file_name', None)
+
+    if not file_name:
+        return Response({"error": "File name was not provided."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        csv_data_obj = CsvData.objects.get(file_name=file_name)
+    except CsvData.DoesNotExist:
+        return Response({"error": "File does not exist."}, status=status.HTTP_404_NOT_FOUND)
+    
+    data = {'csv_data': csv_data_obj.csv_data} if csv_data_obj else {}
+    
+    return Response(data, status=status.HTTP_200_OK)
 
 @api_view(['DELETE'])
 def delete_csv(request):
