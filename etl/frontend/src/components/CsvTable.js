@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Papa from 'papaparse';
 import { Link, useParams } from 'react-router-dom';
+import getCookie from './cookies';
 
 const CsvTable = () => {
   const [csvData, setCsvData] = useState([]);
@@ -148,10 +149,5 @@ const CsvTable = () => {
     </div>
   ); 
 };
-
-function getCookie(name) {
-  const cookieValue = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
-  return cookieValue ? cookieValue.pop() : '';
-}
 
 export default CsvTable;

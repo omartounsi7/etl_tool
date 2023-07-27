@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link, useNavigate  } from "react-router-dom";
 import './upload.css';
+import getCookie from './cookies';
 
 const UploadFile = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -79,11 +80,6 @@ const UploadFile = () => {
     </div>
   );
 };
-
-function getCookie(name) {
-  const cookieValue = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
-  return cookieValue ? cookieValue.pop() : '';
-}
 
 export default UploadFile;
 
