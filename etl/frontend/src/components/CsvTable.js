@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Papa from 'papaparse';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 
 const CsvTable = () => {
   const [csvData, setCsvData] = useState([]);
@@ -16,15 +16,18 @@ const CsvTable = () => {
   const [opData, setOpData] = useState('add');
   const [errorMessage, setErrorMessage] = useState('');
 
+  const { fileName } = useParams();
+
   useEffect(() => {
-    fetchCsvData();
+    fetchCsvData(fileName);
     const csrftoken = getCookie('csrftoken');
     axios.defaults.headers.common['X-CSRFToken'] = csrftoken;
   }, []);
 
   const fetchCsvData = async () => {
     try {
-      const response = await axios.get('/api/get-csv/');
+      console.log(fileName)
+      const response = await axios.get('/api/get-csv/', { params: { file_name: fileName } });
       const parsedCsvData = parseCsvData(response.data.csv_data);
       setCsvData(parsedCsvData.data);
       setHeaders(parsedCsvData.meta.fields);

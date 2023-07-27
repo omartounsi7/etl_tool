@@ -51,12 +51,12 @@ const ListFiles = () => {
     }
   };
 
-  const handleDisplay = () => {
-    // Navigate to the CsvTable component with the file_name as a URL parameter
-    navigate(`/display-file`);
+  const handleDisplay = (fileName) => {
+    // Navigate to the CsvTable component
+    navigate(`/display-file/${fileName}`);
   };
 
-  return (
+  return ( 
     <div>
       <h2>Uploaded Files:</h2>
       {files.length > 0 ? (
@@ -84,7 +84,7 @@ const ListFiles = () => {
                   <button onClick={() => handleDelete(file.file_name)}>Delete</button>
                 </td>
                 <td>
-                  <button onClick={() => handleDisplay()}>Display</button>
+                  <button onClick={() => handleDisplay(file.file_name)}>Display</button>
                 </td>
               </tr>
             ))}

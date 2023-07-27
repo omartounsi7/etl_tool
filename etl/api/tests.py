@@ -196,37 +196,32 @@ class TransformCSVFieldTest(APITestCase):
 class GetCsvViewTestCase(TestCase):
     def setUp(self):
         # Create some CsvData objects for testing
-        CsvData.objects.create(csv_data="1,2,3\r\n4,5,6\r\n")
-        CsvData.objects.create(csv_data="A,B,C\r\nD,E,F\r\n")
+        CsvData.objects.create(csv_data="1,2,3\r\n4,5,6\r\n", file_name="test1.csv")
 
     def test_get_csv_with_data(self):
         # Make a GET request to the view
         factory = APIRequestFactory()
-        request = factory.get('/api/get-csv/')
+        request = factory.get('/api/get-csv/', {'file_name': "test1.csv"})
         response = get_csv(request)
 
         # Check the response status code
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # Check that the response data contains the last CsvData object's csv_data
-        last_csv_data = CsvData.objects.last()
-        expected_data = {'csv_data': last_csv_data.csv_data}
+        expected_data = {'csv_data': "1,2,3\r\n4,5,6\r\n"}
         self.assertEqual(response.data, expected_data)
 
     def test_get_csv_without_data(self):
-        # Delete all CsvData objects to simulate no data
-        CsvData.objects.all().delete()
-
         # Make a GET request to the view
         factory = APIRequestFactory()
-        request = factory.get('/api/get-csv/')
+        request = factory.get('/api/get-csv/', {'file_name': "test2.csv"})
         response = get_csv(request)
 
         # Check the response status code
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
         # Check that the response data is an empty dictionary
-        self.assertEqual(response.data, {})
+        self.assertEqual(response.data, {'error': 'File does not exist.'})
 
 class CsvDataUploadViewTestCase(TestCase):
     def test_upload_csv_file(self):

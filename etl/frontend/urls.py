@@ -6,4 +6,4 @@ urlpatterns = [
     path('upload/', index),
     path('display-file/', index),
     path('list-files/', index) 
-]
+] 
