@@ -27,7 +27,6 @@ const CsvTable = () => {
 
   const fetchCsvData = async () => {
     try {
-      console.log(fileName)
       const response = await axios.get('/api/get-csv/', { params: { file_name: fileName } });
       const parsedCsvData = parseCsvData(response.data.csv_data);
       setCsvData(parsedCsvData.data);
@@ -89,16 +88,14 @@ const CsvTable = () => {
 
   return (
     <div>
-      <h1>Your CSV file</h1>
+      <h2>Your CSV file</h2>
+      <h3>{fileName}</h3>
       <table>
         <thead>{renderTableHeaders()}</thead>
         <tbody>{renderTableRows()}</tbody>
       </table>
-
-      <br /><br />
-
       {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
-
+      <p>If you wish to modify one field only, enter the start coordinates and leave the end coordinates blank.</p>
       <form onSubmit={handleSubmit}>
         <label>
           Start row:
@@ -139,7 +136,6 @@ const CsvTable = () => {
         <br />
         <button type="submit">Apply Transformation</button>
       </form>
-      <p>If you wish to modify one field only, enter the start coordinates and leave the end coordinates blank.</p>
       <p>Rows and columns are one-indexed.</p>
 
       <br />
