@@ -88,7 +88,7 @@ const CsvTable = () => {
 
   return (
     <div>
-      <h2>Your CSV file</h2>
+      <h2>Your CSV file:</h2>
       <h3>{fileName}</h3>
       <table>
         <thead>{renderTableHeaders()}</thead>
@@ -107,7 +107,6 @@ const CsvTable = () => {
           <input type="text" value={startColData} onChange={(e) => setStartColData(e.target.value)} />
         </label>
         <br />
-
         <label>
           End row:
           <input type="text" value={endRowData} onChange={(e) => setEndRowData(e.target.value)} />
@@ -118,7 +117,6 @@ const CsvTable = () => {
           <input type="text" value={endColData} onChange={(e) => setEndColData(e.target.value)} />
         </label>
         <br />
-
         <label>
           Number:
           <input type="number" value={numberData} onChange={(e) => setNumberData(e.target.value)} />
@@ -137,7 +135,6 @@ const CsvTable = () => {
         <button type="submit">Apply Transformation</button>
       </form>
       <p>Rows and columns are one-indexed.</p>
-
       <br />
       <Link to="/upload">Upload another file</Link>
       <br />

@@ -60,7 +60,7 @@ const UploadFile = () => {
     <div>
       {successMessage && <p>{successMessage}</p>}
       {errorMessage && <p>{errorMessage}</p>}
-      <p>Please upload a file.</p>
+      <h3>Please upload a file:</h3>
       <div
         className="drop-container"
         onDrop={handleDrop}
@@ -70,7 +70,7 @@ const UploadFile = () => {
         {selectedFile ? (
           <p>{selectedFile.name}</p>
         ) : (
-          <p>Drag and drop a file here or click to select a file</p>
+          <p>Drag and drop a file here or click to select a file.</p>
         )}
       </div>
       <input type="file" onChange={handleFileChange} />
