@@ -18,6 +18,19 @@ const ListFiles = () => {
     fetchData();
   }, []);
 
+  const handleDownload = (fileName) => {
+    // Construct the URL to download the file
+    const downloadURL = `/media/${fileName}`;
+
+    // Create a temporary link and click it to initiate the download
+    const link = document.createElement('a');
+    link.href = downloadURL;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div>
       <h2>Uploaded Files:</h2>
@@ -26,8 +39,9 @@ const ListFiles = () => {
           <thead>
             <tr>
               <th>ID</th>
-              <th>File name</th>
-              <th>Uploaded at</th>
+              <th>File Name</th>
+              <th>Uploaded At</th>
+              <th>Download</th>
             </tr>
           </thead>
           <tbody>
@@ -36,6 +50,9 @@ const ListFiles = () => {
                 <td>{file.id}</td>
                 <td>{file.file_name}</td>
                 <td>{new Date(file.uploaded_at).toLocaleDateString()}</td>
+                <td>
+                  <button onClick={() => handleDownload(file.file_name)}>Download</button>
+                </td>
               </tr>
             ))}
           </tbody>
